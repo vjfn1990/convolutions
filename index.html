@@ -1,0 +1,149 @@
+<html>
+	<head>
+		<title>Hola</title>
+	</head>
+	<body>
+		<input type = 'file' id = 'input_original'/>
+		<input type = 'file' id = 'input_mask'/>
+		<input type = 'button' id='generate' value = 'Generate'/>
+		<div style = 'float: left;'>
+			<canvas id = 'canvas_original' style = 'display: inline'/>
+		</div>
+		<div style = 'float: left; clear: left;'>
+			<canvas id = 'canvas_mask'/>
+		</div>
+		<script>
+			var x;
+			var y;
+			var context_original;
+			var context_mask;
+			var image_original = new Image;
+			var image_mask = new Image;
+			var data_original;
+			var mask_data;
+			var infpo_original;
+			var mask_info;
+			var input_original = document.getElementById('input_original');
+			input_original.addEventListener('change', handle_original);
+			var input_mask = document.getElementById('input_mask');
+			input_mask.addEventListener('change', handle_mask);
+			function handle_original(e) {
+				context_original = document.getElementById('canvas_original').getContext('2d');
+				image_original.src = URL.createObjectURL(e.target.files[0]);
+				image_original.onload = function() {
+					//console.log(image_original.width);
+					//console.log(image_original.height);
+					document.getElementById('canvas_original').width = image_original.width;
+					document.getElementById('canvas_original').height = image_original.height;
+					context_original.drawImage(image_original, 0, 0, image_original.width, image_original.height, 0, 0, image_original.width, image_original.height);
+					data_original = context_original.getImageData(0, 0, image_original.width, image_original.height);
+					info_original = data_original.data;
+					/*var x = 20;
+					var y = 20;
+					var red = original_info[((1920 * y) + x) * 4];
+					var green = original_info[((1920 * y) + x) * 4 + 1];
+					var blue = original_info[((1920 * y) + x) * 4 + 2];
+					var alpha = original_info[((1920 * y) + x) * 4 + 3];
+					console.log(red);
+					console.log(green);
+					console.log(blue);
+					console.log(alpha);*/
+				}
+			}
+			function handle_mask(e) {
+				context_mask = document.getElementById('canvas_mask').getContext('2d');
+				image_mask.src = URL.createObjectURL(e.target.files[0]);
+				image_mask.onload = function() {
+					//console.log(image_mask.width);
+					//console.log(image_mask.height);
+					document.getElementById('canvas_mask').width = image_mask.width;
+					document.getElementById('canvas_mask').height = image_mask.height;
+					context_mask.drawImage(image_mask, 0, 0, image_mask.width, image_mask.height, 0, 0, image_mask.width, image_mask.height);
+					data_mask = context_mask.getImageData(0, 0, image_mask.width, image_mask.height);
+					info_mask = data_mask.data;
+					/*var x = 20;
+					var y = 20;
+					var red = original_info[((1920 * y) + x) * 4];
+					var green = original_info[((1920 * y) + x) * 4 + 1];
+					var blue = original_info[((1920 * y) + x) * 4 + 2];
+					var alpha = original_info[((1920 * y) + x) * 4 + 3];
+					console.log(red);
+					console.log(green);
+					console.log(blue);
+					console.log(alpha);*/
+				}
+			}
+			document.getElementById('generate').onclick = function(e) {
+				var aux;
+				var aux2;
+				var romper = 0;
+				color = [255.0, 127.0, 127.0];
+				console.log(color);
+				color = [color[0]/255.0, color[1]/255.0, color[2]/255.0];
+				console.log(color);
+				alert('Begin');
+				for(y = 0; y < image_original.height; y++) {
+					
+					console.log(x);
+					for(x = 0; x < image_original.width; x++) {
+						
+						if(info_mask[((image_mask.width * y) + x) * 4] > 127) {
+							/*console.log('hola');
+							console.log(info_original[((image_original.width * y) + x) * 4]);
+							console.log(info_original[((image_original.width * y) + x) * 4 + 1]);
+							console.log(info_original[((image_original.width * y) + x) * 4 + 2]);
+							console.log(image_original.width);
+							console.log(image_original.height);
+							console.log(x);
+							console.log(y);
+							console.log('chao');
+							info_original[((image_original.width * y) + x) * 4] = 0;
+							info_original[((image_original.width * y) + x) * 4 + 1] = 0;
+							info_original[((image_original.width * y) + x) * 4 + 2] = 0;*/
+
+							/*info_original[((image_original.width * y) + x) * 4] = 0;
+							info_original[((image_original.width * y) + x) * 4 + 1] = 0;
+							info_original[((image_original.width * y) + x) * 4 + 2] = 255;*/
+
+
+			aux = info_original[((image_original.width * y) + x) * 4] / 255.0;
+			if (color[0] > 0.5) {
+				aux2 = (1.0 - (1.0 - 2.0 * (color[0] - 0.5)) * (1.0 - aux));
+			} else {
+				aux2 = ((2.0 * color[0]) * aux);
+			}
+			info_original[((image_original.width * y) + x) * 4] = Math.floor(aux2 * 255.0);
+
+
+
+			aux = info_original[((image_original.width * y) + x) * 4 + 1] / 255.0;
+			if (color[1] > 0.5) {
+				aux2 = (1.0 - (1.0 - 2.0 * (color[1] - 0.5)) * (1.0 - aux));
+			} else {
+				aux2 = ((2.0 * color[1]) * aux);
+			}
+			info_original[((image_original.width * y) + x) * 4 + 1] = Math.floor(aux2 * 255.0);
+
+
+
+			aux = info_original[((image_original.width * y) + x) * 4 + 2] / 255.0;
+			if (color[2] > 0.5) {
+				aux2 = (1.0 - (1.0 - 2.0 * (color[2] - 0.5)) * (1.0 - aux));
+			} else {
+				aux2 = ((2.0 * color[2]) * aux);
+			}
+			info_original[((image_original.width * y) + x) * 4 + 2] = Math.floor(aux2 * 255.0);
+
+			romper = 1;
+
+						}
+					}
+				}
+				context_original.putImageData(data_original, 0, 0);
+				//data_original.data = info_original;
+				//context_original.drawImage(image_original, 0, 0, image_original.width, image_original.height, 0, 0, image_original.width, image_original.height);
+				alert('End');
+			}
+		</script>
+	</body>
+</html>
